@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Handles web requests related to Schedules.
@@ -24,19 +25,14 @@ public class ScheduleController {
         this.scheduleService = scheduleService;
     }
 
+
     public static ScheduleDTO convertScheduleToDTO(Schedule schedule){
-        ScheduleDTO scheduleDTO = new ScheduleDTO();
+        List<Long> employeeIds = schedule.getEmployeeList().stream().map(employee -> employee.getId()) .collect(Collectors.toList());
+        List<Long> petIds = schedule.getPetList().stream().map(pet -> pet.getId()).collect(Collectors.toList()); ScheduleDTO scheduleDTO = new ScheduleDTO();
         BeanUtils.copyProperties(schedule, scheduleDTO);
-        if (schedule.getEmployeeList()!=null){
-            List<Long> employeeIdList = new ArrayList<>();
-            schedule.getEmployeeList().forEach(employee -> employeeIdList.add(employee.getId()));
-            scheduleDTO.setEmployeeIds(employeeIdList);
-        }
-        if (schedule.getPetList()!=null){
-            List<Long> petList = new ArrayList<>();
-            schedule.getPetList().forEach(pet -> petList.add(pet.getId()));
-            scheduleDTO.setEmployeeIds(petList);
-        }
+        scheduleDTO.setId(schedule.getId());
+        scheduleDTO.setEmployeeIds(employeeIds);
+        scheduleDTO.setPetIds(petIds);
         return scheduleDTO;
     }
 
@@ -64,8 +60,8 @@ public class ScheduleController {
 
     @PostMapping
     public ScheduleDTO createSchedule(@RequestBody ScheduleDTO scheduleDTO) {
-        Schedule schedule = scheduleService.createSchedule(convertScheduleToEntity(scheduleDTO));
-        return convertScheduleToDTO(schedule);
+        Schedule schedule = convertScheduleToEntity(scheduleDTO);
+        return convertScheduleToDTO(scheduleService.createSchedule(schedule, scheduleDTO.getEmployeeIds(), scheduleDTO.getPetIds()));
     }
 
     @GetMapping

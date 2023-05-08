@@ -1,6 +1,7 @@
 package com.udacity.jdnd.course3.critter.service;
 
 import com.udacity.jdnd.course3.critter.entity.Customer;
+import com.udacity.jdnd.course3.critter.entity.Employee;
 import com.udacity.jdnd.course3.critter.entity.Pet;
 import com.udacity.jdnd.course3.critter.repo.CustomerRepo;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,10 @@ public class CustomerService {
 
     public CustomerService(CustomerRepo customerRepo) {
         this.customerRepo = customerRepo;
+    }
+
+    public Customer getCustomer (Long id){
+        return customerRepo.getOne(id);
     }
 
     public Customer saveCustomer(Customer customer){
