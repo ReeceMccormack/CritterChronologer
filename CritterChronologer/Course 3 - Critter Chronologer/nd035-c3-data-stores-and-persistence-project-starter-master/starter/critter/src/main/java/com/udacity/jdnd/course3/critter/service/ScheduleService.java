@@ -3,6 +3,7 @@ package com.udacity.jdnd.course3.critter.service;
 import com.udacity.jdnd.course3.critter.entity.Employee;
 import com.udacity.jdnd.course3.critter.entity.Pet;
 import com.udacity.jdnd.course3.critter.entity.Schedule;
+import com.udacity.jdnd.course3.critter.repo.CustomerRepo;
 import com.udacity.jdnd.course3.critter.repo.EmployeeRepo;
 import com.udacity.jdnd.course3.critter.repo.PetRepo;
 import com.udacity.jdnd.course3.critter.repo.ScheduleRepo;
@@ -19,24 +20,31 @@ public class ScheduleService {
     private final EmployeeRepo employeeRepo;
     private final PetRepo petRepo;
 
+    private final CustomerRepo customerRepo;
+
+
     public ScheduleService(ScheduleRepo scheduleRepo,
                            EmployeeRepo employeeRepo,
-                           PetRepo petRepo) {
+                           PetRepo petRepo,
+                           CustomerRepo customerRepo) {
+
         this.scheduleRepo = scheduleRepo;
         this.employeeRepo = employeeRepo;
         this.petRepo = petRepo;
+        this.customerRepo = customerRepo;
     }
 
     public List<Schedule> getScheduleForPet(Long id){
-        return  scheduleRepo.findPetsById(id);
+        return scheduleRepo.findByPetList(petRepo.getOne(id));
     }
 
     public List<Schedule> getScheduleForEmployee(Long id){
-        return scheduleRepo.findEmployeesById(id);
+        List<Schedule> scheduleList = scheduleRepo.findByEmployeeList(employeeRepo.getOne(id));
+        return scheduleList;
     }
 
     public List<Schedule> getScheduleForCustomer(Long id){
-        return scheduleRepo.findPetsById(id);
+        return scheduleRepo.findAllByPetListIn(customerRepo.getOne(id).getPetList());
     }
 
     public List<Schedule> getSchedules(){
